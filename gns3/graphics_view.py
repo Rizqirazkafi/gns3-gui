@@ -74,10 +74,6 @@ class GraphicsView(QtWidgets.QGraphicsView):
     :param parent: parent widget
     """
 
-    # Class-level constants for default colors
-    DEFAULT_DRAWING_GRID_COLOR = QtGui.QColor(208, 208, 208)  # #D0D0D0
-    DEFAULT_NODE_GRID_COLOR = QtGui.QColor(190, 190, 190)     # #BEBEBE
-
     def __init__(self, parent):
 
         # Our parent is the central widget which parent is the main window.
@@ -96,8 +92,6 @@ class GraphicsView(QtWidgets.QGraphicsView):
         self._dragging = False
         self._grid_size = 75
         self._drawing_grid_size = 25
-        self._drawing_grid_color = self.DEFAULT_DRAWING_GRID_COLOR
-        self._node_grid_color = self.DEFAULT_NODE_GRID_COLOR
         self._last_mouse_position = None
         self._topology = Topology.instance()
         self._background_warning_msgbox = QtWidgets.QErrorMessage(self)
@@ -672,7 +666,7 @@ class GraphicsView(QtWidgets.QGraphicsView):
                     self.configureSlot()
                     return
                 else:
-                    if item.node().bringToFront():
+                    if sys.platform.startswith("win") and item.node().bringToFront():
                         return
                     self.consoleFromItems(self.scene().selectedItems())
                     return
@@ -866,8 +860,8 @@ class GraphicsView(QtWidgets.QGraphicsView):
             show_in_file_manager_action.triggered.connect(self.showInFileManagerSlot)
             menu.addAction(show_in_file_manager_action)
 
-        if not sys.platform.startswith("darwin") and True in list(map(lambda item: isinstance(item, NodeItem) and hasattr(item.node(), "bringToFront"), items)):
-            # Action: bring console or window to front (Windows and Linux only)
+        if sys.platform.startswith("win") and True in list(map(lambda item: isinstance(item, NodeItem) and hasattr(item.node(), "bringToFront"), items)):
+            # Action: bring console or window to front (Windows only)
             bring_to_front_action = QtWidgets.QAction("Bring to front", menu)
             bring_to_front_action.setIcon(get_icon("front.svg"))
             bring_to_front_action.triggered.connect(self.bringToFrontSlot)
@@ -1665,39 +1659,11 @@ class GraphicsView(QtWidgets.QGraphicsView):
         self._topology.addDrawing(item)
         return item
 
-    @QtCore.Property(QtGui.QColor)
-    def drawingGridColor(self):
-        """Returns the drawing grid color"""
-        return self._drawing_grid_color
-
-    @drawingGridColor.setter
-    def drawingGridColor(self, color):
-        """Sets the drawing grid color"""
-        self._drawing_grid_color = color
-        self.viewport().update()
-
-    @QtCore.Property(QtGui.QColor)
-    def nodeGridColor(self):
-        """Returns the node grid color"""
-        return self._node_grid_color
-
-    @nodeGridColor.setter
-    def nodeGridColor(self, color):
-        """Sets the node grid color"""
-        self._node_grid_color = color
-        self.viewport().update()
-
-    def resetGridColors(self):
-        """Reset grid colors to defaults"""
-        self._drawing_grid_color = self.DEFAULT_DRAWING_GRID_COLOR
-        self._node_grid_color = self.DEFAULT_NODE_GRID_COLOR
-        self.viewport().update()
-
     def drawBackground(self, painter, rect):
         super().drawBackground(painter, rect)
         if self._main_window.uiShowGridAction.isChecked():
-            grids = [(self.drawingGridSize(), self._drawing_grid_color),
-                     (self.nodeGridSize(), self._node_grid_color)]
+            grids = [(self.drawingGridSize(), QtGui.QColor(208, 208, 208)),
+                     (self.nodeGridSize(), QtGui.QColor(190, 190, 190))]
             painter.save()
             for (grid, colour) in grids:
                 if not grid:

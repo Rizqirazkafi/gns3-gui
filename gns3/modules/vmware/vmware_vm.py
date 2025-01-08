@@ -19,8 +19,6 @@
 VMware VM implementation.
 """
 
-import sys
-
 from gns3.qt import QtCore
 from gns3.node import Node
 from gns3.utils.bring_to_front import bring_window_to_front_from_process_name
@@ -126,7 +124,7 @@ class VMwareVM(Node):
         Bring the VM window to front.
         """
 
-        if self.status() == Node.started and sys.platform.startswith("win"):
+        if self.status() == Node.started:
             try:
                 vmx_pairs = self.module().parseVMwareFile(self.settings()["vmx_path"])
             except OSError as e:
