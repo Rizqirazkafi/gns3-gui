@@ -61,7 +61,7 @@ class EthernetLinkItem(LinkItem):
             if self._hovered:
                 self.setPen(QtGui.QPen(QtCore.Qt.red, self._pen_width + 1, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             else:
-                self.setPen(QtGui.QPen(QtGui.QColor("#000000"), self._pen_width, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+                self.setPen(QtGui.QPen(QtGui.QColor("#ffffff"), self._pen_width, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
 
         # draw a line between nodes
         path = QtGui.QPainterPath(self.source)
